@@ -64,14 +64,25 @@ http://localhost:3000/facebook/webhook
 
 ### 4. Deploy to Production
 
-Deploy to Vercel (recommended):
+**For Vercel Deployment (Recommended):**
+
+⚠️ **Important:** Do NOT push `.env.local` to GitHub!
+
+See detailed deployment guide: [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)
+
+**Quick Steps:**
+1. Set environment variables in Vercel Dashboard (see [VERCEL_ENV_SETUP.txt](VERCEL_ENV_SETUP.txt))
+2. Deploy to Vercel
+3. Redeploy after adding environment variables
 
 ```bash
-npm install -g vercel
+git push origin main
+# Or use Vercel CLI
 vercel --prod
 ```
 
-Or deploy to any platform that supports Next.js and HTTPS.
+**Other Platforms:**
+Deploy to any platform that supports Next.js and HTTPS (set environment variables in their dashboard).
 
 ### 5. Configure Facebook Webhook
 

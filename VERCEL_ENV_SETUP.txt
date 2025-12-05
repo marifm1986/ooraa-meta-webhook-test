@@ -1,0 +1,148 @@
+===============================================
+VERCEL ENVIRONMENT VARIABLES SETUP
+===============================================
+
+⚠️ IMPORTANT: Copy these values to Vercel Dashboard
+DO NOT push .env files to GitHub!
+
+Your Vercel Project: ooraa-meta-webhook-test
+URL: https://ooraa-meta-webhook-test.vercel.app/
+
+===============================================
+STEP 1: Go to Vercel Dashboard
+===============================================
+
+1. Open: https://vercel.com/dashboard
+2. Select project: ooraa-meta-webhook-test
+3. Go to: Settings → Environment Variables
+
+===============================================
+STEP 2: Add These 3 Environment Variables
+===============================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Variable 1: FACEBOOK_VERIFY_TOKEN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Key: FACEBOOK_VERIFY_TOKEN
+
+Value: ymyMetawebhookOoraa2025
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Variable 2: FACEBOOK_PAGE_ACCESS_TOKEN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Key: FACEBOOK_PAGE_ACCESS_TOKEN
+
+Value: EAASmryecK9QBQDj0v7Oi7lTT0t0h3exgZBVUPC99oOUewCUv6o024nDishTJm6ZAn48VXjJDZAXkyRoRFL8gsZAbOQhqjtho5OJSTTMKbSv54ZB7riLTsVuXOUItoTJa2O9UF5gcWJTsV2ZBcBltAecO95C8riQ6KsZBKICrAaDRCgzz2eWJxx2PxZAnh8iD107qH7GCuRAa4MyeW2LkZBwI5usUja8W625HXve3Wp4dTg5TFF1KIX8CkLry9xZCLP2myysoITcf9Qdu15dmxCZBRIeZBZCZAY8qZCx7ARwshf9rzzCNUTbPucwOXPVPVj4cZCQKQNVhA93wuAZDZD
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Variable 3: FORTHCRM_POST_URL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Key: FORTHCRM_POST_URL
+
+Value: https://login.forthcrm.com/post/8cff5e1b3e11b891fe021f9e4c64ff2d169ece58/
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+===============================================
+STEP 3: Redeploy Your Application
+===============================================
+
+After adding all variables, you MUST redeploy:
+
+Method 1: Via Vercel Dashboard
+1. Go to Deployments tab
+2. Click "..." on latest deployment
+3. Click "Redeploy"
+
+Method 2: Push a new commit
+git commit --allow-empty -m "Add env vars"
+git push
+
+===============================================
+STEP 4: Verify Deployment
+===============================================
+
+Test URL (open in browser):
+https://ooraa-meta-webhook-test.vercel.app/facebook/webhook?hub.mode=subscribe&hub.verify_token=ymyMetawebhookOoraa2025&hub.challenge=test123
+
+Expected Response: test123
+
+✅ If you see "test123" - Success!
+❌ If error - Check env vars and redeploy
+
+===============================================
+STEP 5: Configure Facebook Webhook
+===============================================
+
+1. Go to: https://developers.facebook.com/apps
+2. Select your App
+3. Go to: Products → Webhooks
+4. Click: Configure (next to Page)
+5. Click: Add Subscription
+
+Enter these values:
+
+Callback URL:
+https://ooraa-meta-webhook-test.vercel.app/facebook/webhook
+
+Verify Token:
+ymyMetawebhookOoraa2025
+
+Subscription Fields:
+✅ leadgen
+
+6. Click "Verify and Save"
+7. You should see green checkmark ✓
+
+===============================================
+TROUBLESHOOTING
+===============================================
+
+Problem: Facebook verification fails
+
+Solution:
+1. Test URL manually in browser first
+2. Check all 3 env vars are set in Vercel
+3. Verify you redeployed after adding env vars
+4. Check Function logs in Vercel Dashboard
+5. Ensure token exactly matches (case-sensitive)
+
+Problem: Env vars not working
+
+Solution:
+1. Go to Vercel → Deployments → Functions
+2. Click on /facebook/webhook function
+3. Check "Environment Variables" section
+4. Should show all 3 variables
+5. If missing, add them and redeploy
+
+===============================================
+MONITORING
+===============================================
+
+View logs:
+1. Vercel Dashboard → Your Project
+2. Deployments → Latest deployment
+3. Functions tab
+4. Real-time logs appear here
+
+===============================================
+SECURITY REMINDER
+===============================================
+
+✅ Environment variables are set in Vercel Dashboard
+✅ .env files are git-ignored
+✅ Never commit secrets to GitHub
+✅ Tokens are hidden in Vercel UI
+
+===============================================
+
+Last Updated: December 6, 2025
+Project: ooraa-meta-webhook-test
