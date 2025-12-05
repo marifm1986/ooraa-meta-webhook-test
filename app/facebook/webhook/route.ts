@@ -23,10 +23,13 @@ export async function GET(request: NextRequest) {
     if (mode === 'subscribe' && token === VERIFY_TOKEN) {
       // Respond with the challenge token from the request
       console.log('Webhook verified successfully');
-      return new NextResponse(challenge, { status: 200 });
+      return new NextResponse(challenge ?? '', { status: 200 });
     } else {
       // Responds with '403 Forbidden' if verify tokens do not match
-      console.error('Webhook verification failed - token mismatch');
+      console.error('Webhook verification failed - token mismatch', {
+        receivedToken: token,
+        expectedToken: VERIFY_TOKEN
+      });
       return NextResponse.json(
         { error: 'Verification failed' },
         { status: 403 }
