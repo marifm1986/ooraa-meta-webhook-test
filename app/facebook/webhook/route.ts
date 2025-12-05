@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Environment variables
-const VERIFY_TOKEN = process.env.FACEBOOK_VERIFY_TOKEN || 'your_verify_token_here';
+const VERIFY_TOKEN = process.env.FACEBOOK_VERIFY_TOKEN || 'myMetawebhookOoraa2025';
 const PAGE_ACCESS_TOKEN = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
 const FORTHCRM_POST_URL = process.env.FORTHCRM_POST_URL || 'https://login.forthcrm.com/post/8cff5e1b3e11b891fe021f9e4c64ff2d169ece58/';
 
