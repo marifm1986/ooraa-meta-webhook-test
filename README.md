@@ -59,7 +59,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 The webhook endpoint will be available at:
 ```
-http://localhost:3000/api/facebook/webhook
+http://localhost:3000/facebook/webhook
 ```
 
 ### 4. Deploy to Production
@@ -82,10 +82,9 @@ See [WEBHOOK_SETUP.md](./WEBHOOK_SETUP.md) for detailed setup instructions.
 ```
 .
 ├── app/
-│   ├── api/
-│   │   └── facebook/
-│   │       └── webhook/
-│   │           └── route.ts          # Main webhook endpoint
+│   ├── facebook/
+│   │   └── webhook/
+│   │       └── route.ts               # Main webhook endpoint
 │   ├── globals.css
 │   ├── layout.tsx
 │   └── page.tsx
@@ -99,7 +98,7 @@ See [WEBHOOK_SETUP.md](./WEBHOOK_SETUP.md) for detailed setup instructions.
 
 ## Webhook Endpoints
 
-### GET `/api/facebook/webhook`
+### GET `/facebook/webhook`
 
 Handles Facebook webhook verification.
 
@@ -112,7 +111,7 @@ Handles Facebook webhook verification.
 - Returns `hub.challenge` value if verification succeeds
 - Returns 403 if verification fails
 
-### POST `/api/facebook/webhook`
+### POST `/facebook/webhook`
 
 Receives lead generation events from Facebook.
 
@@ -181,7 +180,7 @@ npm run dev
 
 Visit in your browser:
 ```
-http://localhost:3000/api/facebook/webhook?hub.mode=subscribe&hub.verify_token=YOUR_TOKEN&hub.challenge=test
+http://localhost:3000/facebook/webhook?hub.mode=subscribe&hub.verify_token=YOUR_TOKEN&hub.challenge=test
 ```
 
 Should return: `test`

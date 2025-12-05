@@ -73,7 +73,7 @@ vercel --prod
 
 Your webhook URL will be:
 ```
-https://yourdomain.com/api/facebook/webhook
+https://yourdomain.com/facebook/webhook
 ```
 
 ## Step 3: Configure Facebook Webhook
@@ -88,7 +88,7 @@ https://yourdomain.com/api/facebook/webhook
 
 **Callback URL:**
 ```
-https://yourdomain.com/api/facebook/webhook
+https://yourdomain.com/facebook/webhook
 ```
 
 **Verify Token:**
@@ -116,7 +116,7 @@ If successful, you'll see a green checkmark ✓
 
 Visit this URL in your browser:
 ```
-https://yourdomain.com/api/facebook/webhook?hub.mode=subscribe&hub.verify_token=YOUR_VERIFY_TOKEN&hub.challenge=test123
+https://yourdomain.com/facebook/webhook?hub.mode=subscribe&hub.verify_token=YOUR_VERIFY_TOKEN&hub.challenge=test123
 ```
 
 You should see: `test123`
@@ -205,7 +205,7 @@ Then check the terminal output.
          ▼
 ┌────────────────────────────────┐
 │  Your Webhook Endpoint         │
-│  /api/facebook/webhook         │
+│  /facebook/webhook             │
 └────────┬───────────────────────┘
          │
          ▼
