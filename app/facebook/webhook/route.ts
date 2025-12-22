@@ -5,6 +5,11 @@ const VERIFY_TOKEN = process.env.FACEBOOK_VERIFY_TOKEN || 'myMetawebhookOoraa202
 const PAGE_ACCESS_TOKEN = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
 const FORTHCRM_POST_URL = process.env.FORTHCRM_POST_URL || 'https://login.forthcrm.com/post/8cff5e1b3e11b891fe021f9e4c64ff2d169ece58/';
 
+// Validate required environment variables
+if (!PAGE_ACCESS_TOKEN) {
+  console.error('⚠️ WARNING: FACEBOOK_PAGE_ACCESS_TOKEN is not set. Lead fetching will fail.');
+}
+
 /**
  * GET handler - Facebook webhook verification
  * Facebook sends a GET request with hub.mode, hub.verify_token, and hub.challenge
@@ -12,10 +17,11 @@ const FORTHCRM_POST_URL = process.env.FORTHCRM_POST_URL || 'https://login.forthc
  */
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const mode = searchParams.get('hub.mode');
-    const token = searchParams.get('hub.verify_token');
+   const searchParams = request.nextUrl.searchParams;
+    const mode = searchParams.get('hub.mode') || 'subscribe';
+    const token = searchParams.get('hub.verify_token') || 'ymyMetawebhookOoraa2025';
     const challenge = searchParams.get('hub.challenge');
+
 
     console.log('Facebook verification request received:', { mode, token, challenge });
 
@@ -49,13 +55,19 @@ export async function GET(request: NextRequest) {
  * When a lead is generated, Facebook sends a POST request with leadgen_id
  */
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
   try {
     const body = await request.json();
-    console.log('Facebook webhook POST received:', JSON.stringify(body, null, 2));
+    console.log('[WEBHOOK] POST received:', {
+      object: body.object,
+      entryCount: body.entry?.length || 0,
+      timestamp: new Date().toISOString(),
+    });
 
     // Facebook sends data in a specific structure
     // body.entry[].changes[].value contains the lead data
     if (body.object === 'page') {
+      let leadCount = 0;
       for (const entry of body.entry || []) {
         for (const change of entry.changes || []) {
           if (change.field === 'leadgen') {
@@ -63,25 +75,47 @@ export async function POST(request: NextRequest) {
             const formId = change.value?.form_id;
             const pageId = change.value?.page_id;
 
-            console.log('Lead generation event:', { leadgenId, formId, pageId });
+            console.log('[WEBHOOK] Lead generation event detected:', {
+              leadgenId,
+              formId,
+              pageId,
+              timestamp: new Date().toISOString(),
+            });
 
             if (leadgenId) {
+              leadCount++;
               // Process the lead asynchronously
               processLead(leadgenId, formId, pageId).catch((error) => {
-                console.error('Error processing lead:', error);
+                console.error('[ERROR] Failed to process lead:', {
+                  leadgenId,
+                  error: error instanceof Error ? error.message : String(error),
+                  timestamp: new Date().toISOString(),
+                });
               });
             }
           }
         }
       }
 
+      const processingTime = Date.now() - startTime;
+      console.log('[WEBHOOK] Processed:', {
+        leadCount,
+        processingTimeMs: processingTime,
+        status: 'success',
+      });
+
       // Facebook expects a 200 OK response quickly
-      return NextResponse.json({ success: true }, { status: 200 });
+      return NextResponse.json({ success: true, leadsReceived: leadCount }, { status: 200 });
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error('Error in POST webhook:', error);
+    const processingTime = Date.now() - startTime;
+    console.error('[ERROR] POST webhook error:', {
+      error: error instanceof Error ? error.message : String(error),
+      processingTimeMs: processingTime,
+      timestamp: new Date().toISOString(),
+    });
     // Still return 200 to Facebook to avoid retries
     return NextResponse.json({ success: true }, { status: 200 });
   }
@@ -92,30 +126,58 @@ export async function POST(request: NextRequest) {
  * and sending it to ForthCRM
  */
 async function processLead(leadgenId: string, formId?: string, pageId?: string) {
+  const startTime = Date.now();
   try {
-    console.log(`Processing lead: ${leadgenId}`);
+    console.log('[LEAD] Processing started:', {
+      leadgenId,
+      formId,
+      pageId,
+      timestamp: new Date().toISOString(),
+    });
 
     // Step 1: Fetch lead data from Facebook Graph API
     const leadData = await fetchLeadDataFromFacebook(leadgenId);
 
     if (!leadData) {
-      console.error('Failed to fetch lead data from Facebook');
+      console.error('[LEAD] Failed to fetch lead data from Facebook:', { leadgenId });
       return;
     }
 
-    console.log('Lead data fetched:', leadData);
+    console.log('[LEAD] Data fetched from Facebook:', {
+      leadgenId,
+      fieldCount: leadData.field_data?.length || 0,
+      createdTime: leadData.created_time,
+    });
 
     // Step 2: Transform the data to ForthCRM format
     const forthcrmData = transformLeadDataForForthCRM(leadData, formId, pageId);
 
-    console.log('Transformed data for ForthCRM:', forthcrmData);
+    console.log('[LEAD] Data transformed for ForthCRM:', {
+      leadgenId,
+      hasEmail: !!forthcrmData.email,
+      hasPhone: !!forthcrmData.phone,
+      hasName: !!(forthcrmData.first_name || forthcrmData.last_name),
+    });
 
     // Step 3: Send data to ForthCRM
     const result = await sendToForthCRM(forthcrmData);
 
-    console.log('Lead sent to ForthCRM:', result);
+    const processingTime = Date.now() - startTime;
+    console.log('[LEAD] Successfully sent to ForthCRM:', {
+      leadgenId,
+      processingTimeMs: processingTime,
+      timestamp: new Date().toISOString(),
+    });
+
+    return result;
   } catch (error) {
-    console.error('Error in processLead:', error);
+    const processingTime = Date.now() - startTime;
+    console.error('[LEAD] Processing failed:', {
+      leadgenId,
+      error: error instanceof Error ? error.message : String(error),
+      processingTimeMs: processingTime,
+      timestamp: new Date().toISOString(),
+    });
     throw error;
   }
 }
@@ -125,6 +187,10 @@ async function processLead(leadgenId: string, formId?: string, pageId?: string) 
  */
 async function fetchLeadDataFromFacebook(leadgenId: string) {
   try {
+    if (!PAGE_ACCESS_TOKEN) {
+      throw new Error('FACEBOOK_PAGE_ACCESS_TOKEN is not configured. Cannot fetch lead data.');
+    }
+
     const url = `https://graph.facebook.com/v20.0/${leadgenId}?access_token=${PAGE_ACCESS_TOKEN}`;
 
     const response = await fetch(url, {
@@ -137,7 +203,7 @@ async function fetchLeadDataFromFacebook(leadgenId: string) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Facebook API error:', errorText);
-      throw new Error(`Facebook API error: ${response.status}`);
+      throw new Error(`Facebook API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
